@@ -1,65 +1,142 @@
-import Image from "next/image";
+// src/app/page.tsx
+'use client';
+
+import { useState } from 'react';
+import { TattvaOutput, VerdictLabel, ClaimType } from './types/outputModels';
+import InteractiveReport from '@/components/InteractiveReport';
+
+// Sample data for demonstration
+const sampleReport: TattvaOutput = {
+  summary: "The analyzed content makes several claims about climate change impacts, with varying degrees of accuracy. While some statements are well-supported by scientific consensus, others contain exaggerations or oversimplifications.",
+  tattva_score: 78.5,
+  claims: [
+    {
+      id: 'claim-1',
+      text: "Global temperatures have risen by 2°C since the pre-industrial era.",
+      type: ClaimType.FACT,
+      prominence: 0.9,
+      time_refs: [],
+      named_entities: ["global temperatures", "pre-industrial era"],
+      query_plan: [
+        { query: "global temperature rise since pre-industrial era", evidence_type: "scientific_studies" },
+        { query: "IPCC reports on global warming", evidence_type: "reports" }
+      ],
+      verdict: {
+        label: VerdictLabel.MOSTLY_TRUE,
+        truth_prob: 0.85,
+        truth_prob_cal: 0.87,
+        explanation: "While global temperatures have risen significantly, the actual increase is closer to 1.1-1.2°C as of 2023, not 2°C.",
+        citations: [
+          {
+            title: "IPCC Sixth Assessment Report",
+            url: "https://www.ipcc.ch/report/ar6/wg1/",
+            publisher: "Intergovernmental Panel on Climate Change",
+            date: "2021-2023"
+          }
+        ],
+        gaps: ["The exact time period for the temperature increase is not specified"],
+        modalities_check: {
+          ooc_risk: false,
+          notes: "The claim is verifiable against climate data"
+        }
+      },
+      evidence_strength: 0.9
+    }
+  ],
+  reality_distance: {
+    status: "ok",
+    value: 82,
+    notes: "The content shows good alignment with established climate science, though with some minor inaccuracies."
+  },
+  bias_context: {
+    bias_signals: ["alarmist language", "oversimplification of complex issues"],
+    rhetoric: ["appeal to authority", "slippery slope"],
+    missing_context: [
+      "Does not mention technological advancements in carbon capture",
+      "Ignores regional variations in climate impacts"
+    ],
+    notes: "The content shows a clear environmentalist perspective, which may lead to selective presentation of facts."
+  },
+  limitations: [
+    "Analysis is based on publicly available data up to 2023",
+    "Some claims require specialized scientific expertise to verify completely",
+    "Rapidly evolving nature of climate science means some information may become outdated"
+  ]
+};
 
 export default function Home() {
+  const [mediaUrl, setMediaUrl] = useState('');
+  const [isAnalyzing, setIsAnalyzing] = useState(false);
+  const [showReport, setShowReport] = useState(false);
+  const [report, setReport] = useState<TattvaOutput | null>(null);
+
+  const handleAnalyze = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!mediaUrl.trim()) return;
+    
+    setIsAnalyzing(true);
+    try {
+      // Simulate API call
+      await new Promise(resolve => setTimeout(resolve, 1500));
+      setReport(sampleReport);
+      setShowReport(true);
+    } finally {
+      setIsAnalyzing(false);
+    }
+  };
+
+  if (showReport && report) {
+    return (
+      <div className="min-h-screen bg-gray-50 py-8 px-4">
+        <div className="max-w-6xl mx-auto">
+          <button 
+            onClick={() => setShowReport(false)} 
+            className="mb-6 flex items-center text-indigo-600 hover:text-indigo-800 transition-colors"
+          >
+            <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 19l-7-7m0 0l7-7m-7 7h18" />
+            </svg>
+            Back to analysis
+          </button>
+          <InteractiveReport report={report} />
+        </div>
+      </div>
+    );
+  }
+
   return (
-    <div className="flex min-h-screen items-center justify-center bg-zinc-50 font-sans dark:bg-black">
-      <main className="flex min-h-screen w-full max-w-3xl flex-col items-center justify-between py-32 px-16 bg-white dark:bg-black sm:items-start">
-        <Image
-          className="dark:invert"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={100}
-          height={20}
-          priority
-        />
-        <div className="flex flex-col items-center gap-6 text-center sm:items-start sm:text-left">
-          <h1 className="max-w-xs text-3xl font-semibold leading-10 tracking-tight text-black dark:text-zinc-50">
-            To get started, edit the page.tsx file.
-          </h1>
-          <p className="max-w-md text-lg leading-8 text-zinc-600 dark:text-zinc-400">
-            Looking for a starting point or more instructions? Head over to{" "}
-            <a
-              href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Templates
-            </a>{" "}
-            or the{" "}
-            <a
-              href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Learning
-            </a>{" "}
-            center.
-          </p>
-        </div>
-        <div className="flex flex-col gap-4 text-base font-medium sm:flex-row">
-          <a
-            className="flex h-12 w-full items-center justify-center gap-2 rounded-full bg-foreground px-5 text-background transition-colors hover:bg-[#383838] dark:hover:bg-[#ccc] md:w-[158px]"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className="dark:invert"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={16}
-              height={16}
+    <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100 flex items-center justify-center p-4">
+      <div className="w-full max-w-2xl bg-white rounded-2xl shadow-xl overflow-hidden">
+        <div className="p-8 text-center">
+          <h1 className="text-3xl font-bold text-indigo-600">Tattva</h1>
+          <h2 className="text-2xl font-semibold text-gray-800 mb-2">Informed Opinions</h2>
+          <p className="text-gray-600 mb-8">Get insights and analysis on any media content</p>
+          <form onSubmit={handleAnalyze} className="space-y-6">
+            <input
+              type="url"
+              value={mediaUrl}
+              onChange={(e) => setMediaUrl(e.target.value)}
+              placeholder="Paste a YouTube, Twitter, or article link..."
+              className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none transition"
+              required
             />
-            Deploy Now
-          </a>
-          <a
-            className="flex h-12 w-full items-center justify-center rounded-full border border-solid border-black/[.08] px-5 transition-colors hover:border-transparent hover:bg-black/[.04] dark:border-white/[.145] dark:hover:bg-[#1a1a1a] md:w-[158px]"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Documentation
-          </a>
+            <button
+              type="submit"
+              disabled={isAnalyzing}
+              className={`w-full py-3 px-6 rounded-lg text-white font-medium transition-colors ${
+                isAnalyzing
+                  ? 'bg-indigo-400 cursor-not-allowed'
+                  : 'bg-indigo-600 hover:bg-indigo-700'
+              }`}
+            >
+              {isAnalyzing ? 'Analyzing...' : 'Generate Analysis'}
+            </button>
+            <p className="text-sm text-gray-500 mt-4">
+              Try with any YouTube, Instagram, Twitter, or news article link
+            </p>
+          </form>
         </div>
-      </main>
+      </div>
     </div>
   );
 }
