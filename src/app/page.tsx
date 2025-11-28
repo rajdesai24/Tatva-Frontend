@@ -5,7 +5,6 @@ import { useState, useEffect } from 'react';
 import { useUser } from '@clerk/nextjs';
 import { useRouter } from 'next/navigation';
 import { TattvaOutput, VerdictLabel, ClaimType } from './types/outputModels';
-import Dashboard from '@/components/Dashboard';
 import InteractiveReport from '@/components/InteractiveReport';
 
 const sampleReport: TattvaOutput = {

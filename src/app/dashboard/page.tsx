@@ -5,7 +5,7 @@ import { useUser } from '@clerk/nextjs';
 import { useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
 import { TattvaOutput } from '../types/outputModels';
-import Dashboard from '@/components/Dashboard';
+import EnhancedDashboard from '@/components/EnhancedDashboard';
 
 export default function DashboardPage() {
   const { isLoaded, isSignedIn } = useUser();
@@ -24,6 +24,10 @@ export default function DashboardPage() {
     console.log('Starting new analysis...');
   };
 
+  const handleSelectReport = (report: TattvaOutput) => {
+    setSelectedReport(report);
+  };
+
   if (!isLoaded || !isSignedIn) {
     return (
       <div className="flex items-center justify-center min-h-screen">
@@ -33,10 +37,10 @@ export default function DashboardPage() {
   }
 
   return (
-    <Dashboard 
+    <EnhancedDashboard
       reports={reports}
       onNewAnalysis={handleNewAnalysis}
-      onSelectReport={setSelectedReport}
+      onSelectReport={handleSelectReport}
       selectedReport={selectedReport}
     />
   );
