@@ -1,12 +1,15 @@
 // src/app/page.tsx
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
+import { useUser } from '@clerk/nextjs';
+import { useRouter } from 'next/navigation';
 import { TattvaOutput, VerdictLabel, ClaimType } from './types/outputModels';
+import Dashboard from '@/components/Dashboard';
 import InteractiveReport from '@/components/InteractiveReport';
 
-// Sample data for demonstration
 const sampleReport: TattvaOutput = {
+  limitations: [],
   summary: "The analyzed content makes several claims about climate change impacts, with varying degrees of accuracy. While some statements are well-supported by scientific consensus, others contain exaggerations or oversimplifications.",
   tattva_score: 78.5,
   claims: [
@@ -46,7 +49,7 @@ const sampleReport: TattvaOutput = {
   reality_distance: {
     status: "ok",
     value: 82,
-    notes: "The content shows good alignment with established climate science, though with some minor inaccuracies."
+    notes: "The content shows a clear environmentalist perspective, which may lead to selective presentation of facts."
   },
   bias_context: {
     bias_signals: ["alarmist language", "oversimplification of complex issues"],
@@ -56,15 +59,24 @@ const sampleReport: TattvaOutput = {
       "Ignores regional variations in climate impacts"
     ],
     notes: "The content shows a clear environmentalist perspective, which may lead to selective presentation of facts."
-  },
-  limitations: [
-    "Analysis is based on publicly available data up to 2023",
-    "Some claims require specialized scientific expertise to verify completely",
-    "Rapidly evolving nature of climate science means some information may become outdated"
-  ]
+  }
 };
 
 export default function Home() {
+
+  const { isSignedIn, isLoaded } = useUser();
+  const router = useRouter();
+
+  useEffect(() => {
+    if (isLoaded && !isSignedIn) {
+      router.push('/sign-in');
+    }
+  }, [isLoaded, isSignedIn, router]);
+
+  if (!isLoaded || !isSignedIn) {
+    return null;
+  }
+
   const [mediaUrl, setMediaUrl] = useState('');
   const [isAnalyzing, setIsAnalyzing] = useState(false);
   const [showReport, setShowReport] = useState(false);
