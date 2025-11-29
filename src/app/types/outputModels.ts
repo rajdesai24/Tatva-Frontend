@@ -1,77 +1,58 @@
-export enum VerdictLabel {
-  TRUE = "true",
-  MOSTLY_TRUE = "mostly_true",
-  MIXED = "mixed",
-  MOSTLY_FALSE = "mostly_false",
-  FALSE = "false",
-  UNVERIFIED = "unverified"
-}
-
-export enum ClaimType {
-  FACT = "fact",
-  PREDICTION = "prediction",
-  OPINION_WITH_FACT_CORE = "opinion_with_fact_core"
-}
-
-export interface Citation {
-  title: string;
-  url: string;
-  publisher: string;
-  date?: string;
-  quote?: string;
-}
-
-export interface ModalitiesCheck {
-  ooc_risk: boolean;
-  notes: string;
-}
-
-export interface QueryItem {
-  query: string;
-  evidence_type: string;
-  time_window?: string;
-}
-
-export interface Verdict {
-  label: VerdictLabel;
-  truth_prob: number;
-  truth_prob_cal: number;
-  explanation: string;
-  citations: Citation[];
-  gaps: string[];
-  modalities_check: ModalitiesCheck;
-}
+// src/app/types/outputModels.ts
 
 export interface Claim {
   id: string;
   text: string;
-  type: ClaimType;
-  prominence: number;
+  type: string;
   time_refs: string[];
+  prominence: number;
   named_entities: string[];
-  query_plan: QueryItem[];
   verdict: Verdict;
   evidence_strength: number;
 }
 
+export interface Verdict {
+  gaps: string[];
+  label: string;
+  citations: any[];
+  truth_prob: number;
+  explanation: string;
+  truth_prob_cal: number;
+  modalities_check: {
+    notes: string;
+    ooc_risk: boolean;
+  };
+}
+
 export interface RealityDistance {
-  status: "ok" | "needs_user_input";
-  value: number;
   notes: string;
+  value: number;
+  status: string;
+}
+
+export interface Scores {
+  tattva_score: number;
+  reality_distance: RealityDistance;
 }
 
 export interface BiasContext {
-  bias_signals: string[];
-  rhetoric: string[];
-  missing_context: string[];
   notes: string;
+  rhetoric: string[];
+  bias_signals: string[];
+  missing_context: string[];
 }
 
 export interface TattvaOutput {
-  summary: string;
+  id: string;
+  created_at: string;
+  logs: {
+    status: string;
+    message: string;
+  };
+  clerk_user_id: string;
   claims: Claim[];
-  tattva_score: number;
-  reality_distance: RealityDistance;
+  scores: Scores;
   bias_context: BiasContext;
-  limitations: string[];
+  summary: string;
+  status: string;
 }
