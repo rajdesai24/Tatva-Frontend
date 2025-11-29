@@ -4,7 +4,16 @@
 import { useEffect, useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 
-export default function Mascot({ isActive }: { isActive: boolean }) {
+// In src/components/Mascot.tsx
+export type ExpressionType = 'idle' | 'thinking' | 'happy' | 'excited';
+
+interface MascotProps {
+  expression?: ExpressionType;
+  isActive: boolean;
+}
+
+
+export default function Mascot({ expression, isActive }: MascotProps) {
   const [currentAnimation, setCurrentAnimation] = useState('idle');
   const [showThoughtBubble, setShowThoughtBubble] = useState(false);
   const [thoughtText, setThoughtText] = useState('');

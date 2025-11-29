@@ -62,9 +62,12 @@ const sampleReport: TattvaOutput = {
 };
 
 export default function Home() {
-
   const { isSignedIn, isLoaded } = useUser();
   const router = useRouter();
+  const [mediaUrl, setMediaUrl] = useState('');
+  const [isAnalyzing, setIsAnalyzing] = useState(false);
+  const [showReport, setShowReport] = useState(false);
+  const [report, setReport] = useState<TattvaOutput | null>(null);
 
   useEffect(() => {
     if (isLoaded && !isSignedIn) {
@@ -75,11 +78,6 @@ export default function Home() {
   if (!isLoaded || !isSignedIn) {
     return null;
   }
-
-  const [mediaUrl, setMediaUrl] = useState('');
-  const [isAnalyzing, setIsAnalyzing] = useState(false);
-  const [showReport, setShowReport] = useState(false);
-  const [report, setReport] = useState<TattvaOutput | null>(null);
 
   const handleAnalyze = async (e: React.FormEvent) => {
     e.preventDefault();

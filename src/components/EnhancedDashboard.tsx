@@ -2,6 +2,7 @@
 'use client';
 
 import { useState, useEffect, useCallback } from 'react';
+import { useRouter } from 'next/navigation';
 import { useUser } from '@clerk/nextjs';
 import { motion, AnimatePresence } from 'framer-motion';
 import Mascot from './Mascot';
@@ -37,6 +38,7 @@ const EnhancedDashboard: React.FC<EnhancedDashboardProps> = ({
   onSelectReport,
   selectedReport
 }) => {
+  const router = useRouter();
   const [searchQuery, setSearchQuery] = useState('');
   const [isSidebarOpen, setIsSidebarOpen] = useState(true);
   const [userProgress, setUserProgress] = useState<UserProgress>({
@@ -206,14 +208,6 @@ const EnhancedDashboard: React.FC<EnhancedDashboardProps> = ({
     localStorage.setItem('tattvaProgress', JSON.stringify(userProgress));
   }, [userProgress]);
 
-  // Handle new analysis
-  const handleNewAnalysis = () => {
-    if (searchQuery.trim()) {
-      addXp(5);
-      addMascotMessage(`Analyzing "${searchQuery.substring(0, 30)}${searchQuery.length > 30 ? '...' : ''}"`);
-      onNewAnalysis();
-    }
-  };
 
   // Render progress bar
   const renderProgressBar = () => (
@@ -240,35 +234,6 @@ const EnhancedDashboard: React.FC<EnhancedDashboardProps> = ({
               <h1 className="text-3xl font-bold text-gray-900 mb-2">
                 Welcome back, {user?.firstName || 'Fact Finder'}!
               </h1>
-              <p className="text-gray-600">What would you like to analyze today?</p>
-            </div>
-            
-            {/* Search Bar */}
-            <div className="relative max-w-2xl mx-auto">
-              <input
-                type="text"
-                placeholder="Paste a YouTube, Twitter, or article link..."
-                className="w-full pl-12 pr-4 py-3 bg-white border border-gray-200 rounded-full shadow-sm focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none transition-all"
-                value={searchQuery}
-                onChange={(e) => {
-                  setSearchQuery(e.target.value);
-                }}
-                onKeyDown={(e) => e.key === 'Enter' && handleNewAnalysis()}
-              />
-              <div className="absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-400">
-                <FiSearch className="w-5 h-5" />
-              </div>
-              <button
-                onClick={handleNewAnalysis}
-                disabled={!searchQuery.trim()}
-                className={`absolute right-2 top-1/2 transform -translate-y-1/2 px-4 py-1.5 rounded-full text-sm font-medium ${
-                  searchQuery.trim() 
-                    ? 'bg-indigo-600 text-white hover:bg-indigo-700' 
-                    : 'bg-gray-200 text-gray-400 cursor-not-allowed'
-                } transition-colors`}
-              >
-                Analyze
-              </button>
             </div>
             
             {/* Stats Grid */}
@@ -393,7 +358,7 @@ const EnhancedDashboard: React.FC<EnhancedDashboardProps> = ({
                   <h4 className="text-lg font-medium text-gray-900">No analyses yet</h4>
                   <p className="text-gray-500 mb-4">Start by analyzing your first piece of content</p>
                   <button
-                    onClick={() => setSearchQuery('')}
+                    onClick={() => {router.push('/');}}
                     className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
                   >
                     <FiPlus className="mr-2" />
@@ -494,8 +459,10 @@ const EnhancedDashboard: React.FC<EnhancedDashboardProps> = ({
                 </p>
                 <button
                   onClick={() => {
+                    
                     setActiveTab('dashboard');
                     setSearchQuery('');
+                    router.push('/');
                   }}
                   className="inline-flex items-center px-6 py-3 border border-transparent text-base font-medium rounded-md shadow-sm text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
                 >
@@ -817,29 +784,6 @@ const EnhancedDashboard: React.FC<EnhancedDashboardProps> = ({
                 {activeTab === 'achievements' && 'Achievements'}
               </h2>
               
-              <div className="flex items-center space-x-4">
-                <div className="relative">
-                  <input
-                    type="text"
-                    placeholder="Search..."
-                    className="pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none transition-all"
-                  />
-                  <div className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400">
-                    <FiSearch className="w-5 h-5" />
-                  </div>
-                </div>
-                
-                <div className="flex items-center space-x-2">
-                  <div className="w-8 h-8 rounded-full bg-gray-100 flex items-center justify-center text-gray-600">
-                    {user?.firstName?.charAt(0) || 'U'}
-                  </div>
-                  {isSidebarOpen && (
-                    <span className="text-sm font-medium text-gray-700">
-                      {user?.firstName} {user?.lastName?.charAt(0)}.
-                    </span>
-                  )}
-                </div>
-              </div>
             </div>
           </div>
         </header>
